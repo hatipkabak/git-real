@@ -1,0 +1,376 @@
+-------------------GIT----------------------------
+
+1)
+ git config --global user.name "hatip kabak"
+ git config --global user.email "hatip.kabak@enoca.com"
+ git config --list
+ git config --global color.ui true   //pretty command lines
+ mkdir store
+ cd store
+ git init //initialized empty local repo in Users/enoca/store/.git/ (git metadata stored here)
+
+ git status //to check whats changed since last commit
+
+ git add readme.txt
+
+ git add --all //staging
+
+ git add *.txt //add all txt files in current directory
+
+ git add docs/*.txt //add all txt files in docs directory
+
+ git add docs/  //add all files in docs directory
+
+ git add "*.txt" //add all txt files in the whole project
+ git commit -m "create a Read me"
+ git log //history of commit 	
+
+2)
+	git diff //show unstaged differences since last commit. //no differences,since all changes are staged
+	git diff --staged //view staged differences 
+	git reset HEAD license.txt // unstaged changes after reset // HEAD refers to last 
+	//commit on the current branch or the timeline that we're on
+
+	git checkout -- license.txt // blow away all changes since last commit, son committen sonraki değişiklikleri kaldırır.reset it to the state at last commit.
+
+	git commit -a -m "read me v2" //skip staging and commit //-a add changes from all tracked files (-a -m yerine -am diyebiliriz.)
+
+	git reset --soft HEAD^ //reset into staging.Move to commit before 'HEAD'. son committen bir önceki commite geçer.çıkardığını staging'e atar. (undo last commit,put changes into staging)
+
+	git commit --amend -m "modify readme and add to do" //eğer bi commit yapmışşsak ve sonradan o commite file eklemek yada mesaj değiştirmek istiyorsak (change the last commit)
+
+	git reset --hard HEAD^ // undo last commit and all changes 
+	git reset --hard HEAD^^ // undo last 2 commits and all changes
+
+	git reset HEAD license (license will be STAGED TO UNSTAGED)
+	git reset --soft HEAD^ (last commiti staged e atar)
+	git reset --hard HEAD^ (last commiti siler.)
+    ///self managed server: gitosis or gitorious
+
+    git remote add origin https://github.com/hatipkabak/git-real.git //add:new romete origin:our name for this remote https...:address //github da repo oluşturma
+    git remote -v //show remote repositories
+    git remote remove <name> //to remove remotes
+    git push -u origin master //origin:remote repository name master:local branc to push -u:bir kere u'yu prigin ve master ile tanımlıyoruz.daha sonra sadece git push diyoruz.
+    password caching:https://help.github.com/articles/set-up-git //her seferinde user and password girmek istemiyorsak bu linki oku
+    git pull //to pull changes down from the remote
+
+    HEROKU
+    //if u have heroku account  and install heroku gem
+    //heroku create dediğimizde git repo ssh address'i verir bize. önceden uzun bir url kullanmıştık. git remote -v yaptığımızda heroku herşeyi bizim için yapar.
+    //git remote -v dediğimizde herokunun bizim için bir remote oluşturduğunu görürüz. 
+    //git push heroku master 
+
+    DONT DO THESE AFTER YOU PUSH
+    // Bunları her zaman push yappmadan önce kullanmalıyız. Push yaptıktan sonra kullanırsak history'i bozar.
+    git reset --soft HEAD^
+    git reset --hard HEAD^
+    git reset --hard HEAD^^
+    git commit --amend -m "modify readme"
+
+3)
+	a)cloning a repostiory
+
+		git clone https://github.com/hatipkabak/git-real.git //create a local directory with that repo.(Url of the remote repo) reponun adı neyse local folderin adı da aynı
+		git clone https://github.com/hatipkabak/git-real.git git-demo //ad vermek istersek şimdi git-demo diye bir adı olur.local folder name)
+
+
+	b)branching out
+
+		git branch cat //create  a branch called cat. HEAD stil is on the master or where we are.
+		git checkout cat // branch değiştir.HEAD is now on cat.
+		git merge cat // we are on master , head is the same and merge commits of cat after HEAD with master.(fast forward:eğer bi branchte commit varsa diğerinde bişey yoksa)
+		git branch -d cat // delete branch
+		git push origin --delete shopping-cart //remote taki branchi siler
+
+
+	c)non-fast-forward
+
+		git checkout -b admin // shortcut for "git branch cat and git checkout cat".yeni bir branch yaratır ve HEAD'i oraya alır. 
+		git pull //make sure latest changes
+		git merge admin (vi editor)
+		//j:down k:up h:left l:left esc:leave mode i:insert :wq ->save and quit :q! -> cancel and quit
+
+	d)recursive merge
+		git cant fast forward since changes were made in both branches
+
+
+ Same file:
+  Jane committed her changes and pushed to github
+  Greg committed locally
+
+
+  4)remote branches
+  	git checkout -b shopping-cart
+  	git push origin shopping-cart
+  	git pull 
+  	git branch -r //list all remote branches
+  	git remote show origin //show all of remote branches whether they are tracked or not
+  	git push origin:shopping-cart //removing a branch
+  	git branch -D shopping-cart // remote'ı silmişssin.localdekinide silmek için. küçük d olmaz.
+  	git remote prune origin //to clean up deleted remote branches
+
+
+
+
+  manual olarak file'i düzeltiyoruz. Sonra git commit -a .
+
+  5)TAGGING
+
+  is a reference to a commit  (used mostly for release versioning)
+
+  git tag // list all tags
+  git checkout v0.0.1 // checkout code at commit
+  git tag -a v0.0.3 -m "version 0.0.3" //to add a new tag
+  git push --tags //that will push it to remote.otherwise tags will remain localdekinide
+
+  6)REbase
+
+  Same file:
+  Jane committed her changes and pushed to github
+  Greg committed locally
+  ->when greg do perform "git push" //failed.cannot write over Jane's commit(non fast forward) 
+  ->git pull and git push yaparsak olur fakat iz bırakmak istemiyoruz. instead of pull and push we re going to do fetch and rebase
+  ->fetch // pull down any changes but does not merge them 
+
+  git rebase does three things.
+  1)move all changes to masterwhich are not in origin/master to a temporary area. It takes Greg's commit and move that to a temporary area.
+  (Local deki master'in origindeki masterin HEADlerin aynı olması için local master aynı Head ten sonrakileri bi temporary yere taşır)
+  2)run all of the origin commits.
+  (daha sonra origindeki master'ın Headten sonraki commitleri localdeki mastera verir.)
+  3)run all commits in the temporary area one at a time.
+  (daha sonra bütün commitler temporary area da birleştirilir. master'ım olur artık)
+
+  Eğer rebase de conflite olursa,(aynı file üzerinde çalışımışssa), sorunu çözdükten sonra git rebase --continue deriz. Eğer skip edeceksek git rebase --skip .
+  eğer stop edeceksek git rebase --abort
+
+  git rebase -i HEAD~4
+
+  7)History and configuration
+
+  git log --pretty=oneline //her bir commiti tek line yapar.
+  git log --online -p // hangi linelar eklenip çıkarılmış for the files modified during each commit
+  git log  --pretty=format:"%h %ad- %s [%an]"
+  git log --oneline --stat //how many insertions and deletions  were made for each file included in each commit
+  git log --oneline --graph //visual representations of branches
+
+  ->btw dates
+  	git log --until=1.minute.ago 
+  	git log --since=1.day.ago //1.hour.ago
+
+  	git log --since=1.day.ago --until=2.weeks.ago 
+  	git log --since=2000-01-01 --until=2012-12-21
+
+  git diff //see what has changed since our last commit(exactly same as "git diff HEAD" )
+  git diff HEAD^ //Shows what has changed since the commit before the latest commit.(parent of latest commit) 
+    git diff HEAD^ //(grandparent of latest commit) 
+    git diff HEAD~5 //(five commits ago)
+    git diff HEAD^ ..HEAD //(second mostrecent commit vs most recent)
+    git diff master bird //dif btw two branches
+    git diff 07563v3..1121ds1 //dif two commits
+    git diff --since=2000-01-01 --until=2012-12-21 //(time-based diff)
+    git diff --cached  //Show what has been added to the staging area via git add but not yet committed.
+
+  git blame index.html --date short // to see all of the changes who,when,which
+
+  ==>.git/info/exclude
+  	ex's) experiments/ //will exlude thisfolder from git
+  			*. mp4 
+  			tutorial.mp4
+  			logs/*.log 
+  git rm --cached development.log  //not deleted from local file system,only from git.
+
+==>Aliases
+
+git config --list|grep alias //list all alias
+
+git config --global alias.co checkout // co instead of checkout
+git config --global alias.st status
+git config --global alias.br branch
+git config --global alias.ci commit
+
+
+git config --global alias.mylog "log --pretty=format:'%h %s [%an]' --graph"
+git config --global alias.lol "log --graph --decorate --pretty=oneline --abbrev-commit --all"
+
+//remove alias 
+git config --global --unset alias.mylog
+
+
+
+STASHING
+
+git stash = git stash save 
+git diff ->no diff
+git status ->nothing to commit
+git co master
+git pull
+git co me 
+git stash apply
+git stash list
+git stash apply stash@{1}
+git stash drop
+git diff
+git stash pop = git stash apply and git stash drop
+
+in case stash conflicts(after git stash apply), commit or reset your local changes as appropriate (git reset --hard HEAD), then do the git stash apply again
+
+git stash save --keep-index
+git stash save --include-untracked
+git stash show stash@{0}
+git stash show --patch
+git stash branch newbranch stash@{0} //a branch called newbranch and drop the stash automatically
+git stash clear
+
+
+PURGING HISTORY
+
+*back up history 
+
+git clone petshop petbackup -> cloning into petbackup
+git filter-branch --tree-filter 'rm -f passwords.text'//remove pa..txt from project root //pa..txt yoksa -f koymazsan fail verir.-f koyarsan fail vermez
+git filter-branch --tree-filter 'find . -name "*.mp4" -exec rm {} \;' //remove video files from any directory
+
+git filter-branch --tree-filter 'rm -f passwords.text' -- --all //filter all commits in all branches
+git filter-branch --tree-filter 'rm -f passwords.text' -- HEAD filter only current branch
+
+git filter-branch --index-filter 'remove --cached --ignore-unmatch passwords.text'
+git filter-branch -f --prune-empty -- --all //boş olan commitleri siler
+
+CHERRY-PICK
+
+git cherry-pick 53212e5 //bulundugun branche, sha sı verilmiş olan commiti ekler. Bulundugun branchteki sha sı değişir.
+git cherry-pick --edit 5321 // edit lets you change messages
+git cherry-pick --no-commit 5321212 3243421 //pulls in changes and stages them but doesnot commit. then in case git commit -m "add and combine", it made a single commit.birleştirir.
+
+// no commitin avantajı local branche commiti aldıgında change yapabilirsin
+
+git cherry-pick -x	5321 // -x ad source SHA to commitmessage. eski sha sını gösterir.
+git cherry-pick -signoff 5321 //signoff add currents user's name to commit message
+
+git pull origin master --allow-unrelated-histories
+
+git co . :clear unstaged files
+
+GIT REBASE SUMMARY:
+
+1) eğer non-fast forward, ortak head var ikimizde iş yapmışız.yani ortak headten sonra hem localimde hemde remoteta(yada başka bir branchte)
+normalde önce git pull yaparız sonra push yaparız.
+
+Pull/push yerine Eğer branch(iz) bırakmak istemiyorsak git fetch daha sonra git rebase yapabiliriz.
+
+2)on master: git rebase mama 
+
+3) git rebase -i HEAD~3
+
+editor açılacak
+->REORDER COMMIT
+commitlerin yerlerini değiştirebilirsin.
+	i:insert (for changing file)
+	dd:cut p:paste yy:copy
+
+	esc(after pressing esc :wq->write and save :q!->do not save)
+
+->CHANGE MESSAGES
+
+change pick to reword
+
+pick 1e56233 asfdf
+reword 1sd324 hatip
+
+after writing reword, save and exit(esc and :wq) Another editor pops up.Buraya mesajı yazabiliriz veya burdaki mesajı değiştirebiliriz.save and exit
+
+->SPLIT COMMITS (commitleri bölme)
+
+instead of "pick",write "edit" .(split etmek istediimiz committe pick yerine edit)
+
+To split commits, we need to undo changes that were just replayed
+
+git reset HEAD^
+git add xxx.html
+git ci -m "splitci"
+git add yy.html
+git ci -m "siplit cii"
+git rebase --continue // to finish rebase
+
+->SQUASH COMMITs (commitleri birleştirme)
+
+pick yerine squash yazıyoruz.squash merges a commit with the previous commit. Another editor pops up.burda iki commitin mesajlarını birleştirebilriiz.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
