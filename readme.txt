@@ -1,3 +1,5 @@
-hatip
-kabak
-bakak
+fdahatip:wq
+iiiiiqiq 
+enter
+quit
+
