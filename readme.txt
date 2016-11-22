@@ -1,0 +1,3 @@
+hatip
+kabak
+bakak
